@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Reaction Time Test ⚡ How Fast Are You?</title>
+<meta name="description" content="Test your reaction speed in 5 rounds and see how you compare to animals like cheetahs, cats, and flies. Free online reflex tester.">
+<meta name="keywords" content="reaction time test, reflex test, speed test, reaction speed, 反射神経テスト, 反応速度">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href=""><!-- TODO: Set your canonical URL -->
+
+<!-- Open Graph / SNS Share -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Reaction Time Test ⚡ How Fast Are You?">
+<meta property="og:description" content="Test your reflex speed and compare with animals. Are you faster than a cat?">
+<meta property="og:image" content=""><!-- TODO: Set OG image URL (1200x630) -->
+<meta property="og:url" content=""><!-- TODO: Set your URL -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Reaction Time Test ⚡">
+<meta name="twitter:description" content="Test your reflex speed and compare with animals.">
+
+<!-- PWA / Mobile -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1066623644498010" crossorigin="anonymous"></script>
+<meta name="theme-color" content="#0a0a12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Reflex Test">
+<link rel="manifest" href="manifest.json">
+
+<!-- Favicon (inline SVG) -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+
+<!-- Google Analytics - TODO: Replace GA_MEASUREMENT_ID -->
+<!--
+<script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'GA_MEASUREMENT_ID');
+</script>
+-->
+
+<!-- Google AdSense - TODO: Replace ca-pub-XXXXXXX -->
+<!--
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXX" crossorigin="anonymous"></script>
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a12;
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+    color: #e0e0e0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  #app {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background 0.2s ease;
+    position: relative;
+  }
+  .scanlines {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none; z-index: 100;
+  }
+  .header {
+    width: 100%; max-width: 600px; padding: 20px 20px 0;
+    display: flex; justify-content: space-between; align-items: center;
+    position: relative; z-index: 10;
+  }
+  .header h1 {
+    font-size: clamp(18px, 5vw, 26px); font-weight: 800; margin: 0;
+    background: linear-gradient(135deg, #00ff88, #00ccff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; letter-spacing: -0.5px;
+  }
+  .header .subtitle { font-size: 12px; color: #666; margin: 4px 0 0; letter-spacing: 1px; }
+  .lang-btn {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: #888; padding: 6px 12px; border-radius: 6; cursor: pointer;
+    font-size: 12px; font-family: inherit; transition: all 0.2s;
+  }
+  .lang-btn:hover { background: rgba(255,255,255,0.1); color: #bbb; }
+  .round-dots {
+    display: flex; gap: 8px; padding: 16px 20px 0; z-index: 10;
+  }
+  .dot {
+    width: 40px; height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,0.1); transition: background 0.3s;
+  }
+  .zone {
+    flex: 1; width: 100%; max-width: 600px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 20px; min-height: 300px;
+  }
+  .zone.clickable { cursor: pointer; }
+  .circle {
+    width: 120px; height: 120px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+  }
+  .circle-idle {
+    background: radial-gradient(circle, rgba(0,255,136,0.15) 0%, transparent 70%);
+    border: 2px solid rgba(0,255,136,0.2);
+  }
+  .circle-wait {
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(204,34,0,0.3) 0%, transparent 70%);
+    border: 2px solid rgba(204,34,0,0.4);
+    animation: pulse-red 1.5s ease infinite;
+  }
+  .circle-wait .inner {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: #cc2200; box-shadow: 0 0 40px rgba(204,34,0,0.6);
+  }
+  .circle-go {
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(0,255,102,0.4) 0%, transparent 70%);
+    border: 2px solid rgba(0,255,102,0.5);
+    animation: pulse-green 0.4s ease infinite;
+  }
+  .circle-go .inner {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: #00ff66; box-shadow: 0 0 60px rgba(0,255,102,0.8);
+  }
+  .instructions { color: #666; font-size: 14px; margin-bottom: 32px; }
+  .start-btn {
+    background: linear-gradient(135deg, #00ff88, #00cc66);
+    border: none; color: #000; padding: 16px 48px; border-radius: 12;
+    font-size: 18px; font-weight: 700; cursor: pointer; font-family: inherit;
+    box-shadow: 0 0 30px rgba(0,255,136,0.3); transition: transform 0.15s;
+    letter-spacing: 0.5px;
+  }
+  .start-btn:active { transform: scale(0.96); }
+  .start-btn:hover { filter: brightness(1.1); }
+  .wait-text { font-size: 20px; color: #cc4444; font-weight: 600; }
+  .round-label { font-size: 12px; color: #444; margin-top: 8px; }
+  .go-text {
+    font-size: clamp(28px, 8vw, 42px); color: #00ff66; font-weight: 800;
+    text-shadow: 0 0 30px rgba(0,255,102,0.5);
+    animation: shake 0.1s ease infinite;
+  }
+  .early-emoji { font-size: 64px; }
+  .early-text { font-size: 20px; color: #ff4444; font-weight: 600; margin-top: 16px; }
+  .round-ms {
+    font-size: clamp(48px, 15vw, 80px); font-weight: 800; margin: 0; line-height: 1;
+  }
+  .round-ms .unit { font-size: 0.35em; opacity: 0.7; }
+  .round-continue { color: #555; font-size: 14px; margin-top: 12px; }
+  .result-wrap {
+    text-align: center; width: 100%; max-width: 440px; padding: 0 12px;
+    animation: fadeIn 0.5s ease;
+  }
+  .avg-ms {
+    font-size: clamp(56px, 18vw, 96px); font-weight: 800; margin: 0 0 4px; line-height: 1;
+  }
+  .avg-ms .unit { font-size: 0.3em; opacity: 0.6; }
+  .rank-badge {
+    display: inline-flex; align-items: center; gap: 12px;
+    border-radius: 12px; padding: 8px 20px; margin: 8px 0 20px;
+  }
+  .rank-tier { font-size: 28px; font-weight: 800; }
+  .rank-pct { color: #888; font-size: 14px; }
+  .breakdown {
+    display: flex; justify-content: center; gap: 6px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .breakdown-item {
+    background: rgba(255,255,255,0.04); border-radius: 8px;
+    padding: 6px 10px; font-size: 13px;
+    border: 1px solid rgba(255,255,255,0.06); color: #888;
+  }
+  .breakdown-item.best { }
+  .breakdown-item .label { font-size: 10px; opacity: 0.5; margin-bottom: 2px; }
+  .best-label { font-size: 13px; color: #555; margin-bottom: 4px; }
+  .animal-box {
+    background: rgba(255,255,255,0.03); border-radius: 16px;
+    padding: 16px; margin-top: 16px; border: 1px solid rgba(255,255,255,0.06);
+  }
+  .animal-title {
+    font-size: 12px; color: #555; margin: 0 0 12px; letter-spacing: 1px;
+  }
+  .animal-bar {
+    position: relative; height: 32px; margin-bottom: 8px;
+  }
+  .animal-bar .track {
+    position: absolute; top: 50%; left: 5%; right: 5%;
+    height: 2px; background: rgba(255,255,255,0.08); transform: translateY(-50%);
+  }
+  .animal-bar .marker {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    font-size: 16px; opacity: 0.4; transition: opacity 0.3s;
+  }
+  .animal-bar .marker.highlight { opacity: 1; }
+  .animal-bar .user-marker {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 2px solid #fff; z-index: 5;
+  }
+  .animal-result { font-size: 14px; color: #aaa; margin: 12px 0 0; }
+  .animal-result strong { font-weight: 700; }
+  .actions {
+    display: flex; gap: 12px; margin-top: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  .retry-btn {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    color: #ccc; padding: 12px 28px; border-radius: 10;
+    font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+    transition: all 0.2s;
+  }
+  .retry-btn:hover { background: rgba(255,255,255,0.1); }
+  .share-btn {
+    border: none; color: #000; padding: 12px 28px; border-radius: 10;
+    font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
+    transition: all 0.2s;
+  }
+  .share-btn:hover { filter: brightness(1.1); }
+  .ad-space {
+    margin-top: 32px; padding: 16px; border-radius: 8px;
+    border: 1px dashed rgba(255,255,255,0.08);
+    color: #333; font-size: 11px; letter-spacing: 1px; text-align: center;
+  }
+  .ad-footer {
+    width: 100%; max-width: 600px; padding: 0 20px 20px; z-index: 10;
+  }
+  @keyframes pulse-red {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+  }
+  @keyframes pulse-green {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  /* Structured Data (JSON-LD) */
+</style>
+
+<!-- Structured Data for SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Reaction Time Test",
+  "description": "Test your reaction speed and compare with animals.",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "inLanguage": ["en", "ja"]
+}
+</script>
+</head>
+<body>
+
+<div class="scanlines"></div>
+<div id="app"></div>
+
+<script>
+(function() {
+  "use strict";
+
+  const TOTAL_ROUNDS = 5;
+  const SITE_URL = ""; // TODO: Set your deployed URL
+
+  const ANIMALS = [
+    { en: "Sloth", ja: "ナマケモノ", ms: 800, emoji: "🦥" },
+    { en: "Turtle", ja: "カメ", ms: 600, emoji: "🐢" },
+    { en: "Human (avg)", ja: "人間（平均）", ms: 273, emoji: "🧑" },
+    { en: "Cat", ja: "ネコ", ms: 200, emoji: "🐱" },
+    { en: "Cheetah", ja: "チーター", ms: 150, emoji: "🐆" },
+    { en: "Peregrine Falcon", ja: "ハヤブサ", ms: 100, emoji: "🦅" },
+    { en: "House Fly", ja: "ハエ", ms: 50, emoji: "🪰" }
+  ];
+
+  const T = {
+    en: {
+      title: "Reaction Time Test",
+      subtitle: "How fast are your reflexes?",
+      start: "Start Test",
+      waiting: "Wait for green...",
+      clickNow: "CLICK NOW!",
+      tooEarly: "Too early! Click to retry",
+      ms: "ms",
+      round: "Round",
+      avg: "Average",
+      topPct: "Top",
+      animal: "You're as fast as",
+      share: "Share Result",
+      tryAgain: "Try Again",
+      copied: "Copied!",
+      instructions: "Click / tap when the screen turns green",
+      bestRound: "Best",
+      tapContinue: "tap to continue",
+      animalCompare: "Animal Comparison",
+      shareText: function(avg, rank, animal) {
+        return "⚡ My reaction time: " + avg + "ms (Rank " + rank + ") - Fast as a " + animal + "!\nTest yours: " + SITE_URL;
+      }
+    },
+    ja: {
+      title: "反射神経テスト",
+      subtitle: "あなたの反応速度は？",
+      start: "テスト開始",
+      waiting: "緑になったらクリック...",
+      clickNow: "今すぐクリック！",
+      tooEarly: "早すぎ！クリックでリトライ",
+      ms: "ms",
+      round: "ラウンド",
+      avg: "平均",
+      topPct: "上位",
+      animal: "あなたの速さは",
+      share: "結果をシェア",
+      tryAgain: "もう一度",
+      copied: "コピーしました！",
+      instructions: "画面が緑になったらタップ",
+      bestRound: "最速",
+      tapContinue: "タップで次へ",
+      animalCompare: "動物との比較",
+      shareText: function(avg, rank, animal) {
+        return "⚡ 反射速度: " + avg + "ms（ランク" + rank + "）- " + animal + "並み！\nあなたも挑戦: " + SITE_URL;
+      }
+    }
+  };
+
+  function getRank(ms) {
+    if (ms < 150) return { tier: "S+", pct: 1, color: "#ff00ff" };
+    if (ms < 180) return { tier: "S", pct: 3, color: "#bf00ff" };
+    if (ms < 200) return { tier: "A+", pct: 5, color: "#7b2dff" };
+    if (ms < 220) return { tier: "A", pct: 10, color: "#00d4ff" };
+    if (ms < 250) return { tier: "B+", pct: 20, color: "#00ffa3" };
+    if (ms < 280) return { tier: "B", pct: 35, color: "#a3ff00" };
+    if (ms < 320) return { tier: "C+", pct: 50, color: "#ffe600" };
+    if (ms < 400) return { tier: "C", pct: 65, color: "#ff9500" };
+    if (ms < 500) return { tier: "D", pct: 80, color: "#ff4d4d" };
+    return { tier: "E", pct: 95, color: "#ff0033" };
+  }
+
+  function getClosestAnimal(ms) {
+    var closest = ANIMALS[0], minDiff = Infinity;
+    for (var i = 0; i < ANIMALS.length; i++) {
+      var diff = Math.abs(ANIMALS[i].ms - ms);
+      if (diff < minDiff) { minDiff = diff; closest = ANIMALS[i]; }
+    }
+    return closest;
+  }
+
+  // State
+  var state = {
+    lang: (navigator.language || "en").startsWith("ja") ? "ja" : "en",
+    phase: "idle",
+    round: 0,
+    results: [],
+    currentTime: null,
+    showCopied: false
+  };
+
+  var timerId = null;
+  var startTime = 0;
+  var canProceed = false;
+  var app = document.getElementById("app");
+
+  function t() { return T[state.lang]; }
+
+  function render() {
+    var s = state;
+    var txt = t();
+    var bgColor =
+      s.phase === "waiting" ? "#1a0a0a" :
+      s.phase === "go" ? "#003300" :
+      s.phase === "tooEarly" ? "#330000" : "#0a0a12";
+    app.style.background = bgColor;
+
+    var html = '';
+
+    // Header
+    html += '<div class="header">';
+    html += '<div><h1>' + txt.title + '</h1>';
+    html += '<p class="subtitle">' + txt.subtitle + '</p></div>';
+    html += '<button class="lang-btn" onclick="toggleLang()">' + (s.lang === "ja" ? "EN" : "JP") + '</button>';
+    html += '</div>';
+
+    // Round dots
+    if (s.phase !== "idle" && s.phase !== "done") {
+      html += '<div class="round-dots">';
+      var zoneColor = s.phase === "waiting" ? "#cc2200" : s.phase === "go" ? "#00ff66" : s.phase === "tooEarly" ? "#ff3333" : "rgba(255,255,255,0.1)";
+      for (var i = 0; i < TOTAL_ROUNDS; i++) {
+        var bg = i < s.round ? "#00ff88" : i === s.round ? zoneColor : "rgba(255,255,255,0.1)";
+        html += '<div class="dot" style="background:' + bg + '"></div>';
+      }
+      html += '</div>';
+    }
+
+    // Zone
+    var clickable = s.phase !== "idle" && s.phase !== "done";
+    html += '<div class="zone' + (clickable ? ' clickable' : '') + '"' + (clickable ? ' onclick="handleClick()"' : '') + '>';
+
+    if (s.phase === "idle") {
+      html += '<div style="text-align:center">';
+      html += '<div class="circle circle-idle"><span style="font-size:48px">⚡</span></div>';
+      html += '<p class="instructions">' + txt.instructions + '</p>';
+      html += '<button class="start-btn" onclick="startGame()">&#9654; ' + txt.start + '</button>';
+      html += '</div>';
+    }
+
+    if (s.phase === "waiting") {
+      html += '<div style="text-align:center">';
+      html += '<div class="circle circle-wait"><div class="inner"></div></div>';
+      html += '<p class="wait-text">' + txt.waiting + '</p>';
+      html += '<p class="round-label">' + txt.round + ' ' + (s.round + 1) + ' / ' + TOTAL_ROUNDS + '</p>';
+      html += '</div>';
+    }
+
+    if (s.phase === "go") {
+      html += '<div style="text-align:center">';
+      html += '<div class="circle circle-go"><div class="inner"></div></div>';
+      html += '<p class="go-text">' + txt.clickNow + '</p>';
+      html += '</div>';
+    }
+
+    if (s.phase === "tooEarly") {
+      html += '<div style="text-align:center">';
+      html += '<div class="early-emoji">😬</div>';
+      html += '<p class="early-text">' + txt.tooEarly + '</p>';
+      html += '</div>';
+    }
+
+    if (s.phase === "roundResult") {
+      var rRank = getRank(s.currentTime);
+      html += '<div style="text-align:center;cursor:pointer">';
+      html += '<p class="round-ms" style="color:' + rRank.color + ';text-shadow:0 0 40px ' + rRank.color + '40">';
+      html += s.currentTime + '<span class="unit">' + txt.ms + '</span></p>';
+      html += '<p class="round-continue">' + txt.round + ' ' + s.round + ' / ' + TOTAL_ROUNDS + ' — ' + txt.tapContinue + '</p>';
+      html += '</div>';
+    }
+
+    if (s.phase === "done") {
+      var avg = Math.round(s.results.reduce(function(a,b){return a+b},0) / s.results.length);
+      var best = Math.min.apply(null, s.results);
+      var rank = getRank(avg);
+      var animal = getClosestAnimal(avg);
+
+      html += '<div class="result-wrap">';
+      // Average
+      html += '<p class="avg-ms" style="color:' + rank.color + ';text-shadow:0 0 60px ' + rank.color + '50">';
+      html += avg + '<span class="unit">' + txt.ms + '</span></p>';
+      // Rank badge
+      html += '<div class="rank-badge" style="background:' + rank.color + '15;border:1px solid ' + rank.color + '40">';
+      html += '<span class="rank-tier" style="color:' + rank.color + '">' + rank.tier + '</span>';
+      html += '<span class="rank-pct">' + txt.topPct + ' ' + rank.pct + '%</span>';
+      html += '</div>';
+      // Breakdown
+      html += '<div class="breakdown">';
+      for (var j = 0; j < s.results.length; j++) {
+        var isBest = s.results[j] === best;
+        var borderStyle = isBest ? '1px solid ' + rank.color + '60' : '1px solid rgba(255,255,255,0.06)';
+        var cColor = isBest ? rank.color : '#888';
+        html += '<div class="breakdown-item" style="border:' + borderStyle + ';color:' + cColor + '">';
+        html += '<div class="label">R' + (j+1) + '</div>' + s.results[j] + 'ms</div>';
+      }
+      html += '</div>';
+      // Best
+      html += '<p class="best-label">' + txt.bestRound + ': ' + best + 'ms</p>';
+      // Animal comparison
+      html += '<div class="animal-box">';
+      html += '<p class="animal-title">' + txt.animalCompare + '</p>';
+      html += '<div class="animal-bar"><div class="track"></div>';
+      for (var k = 0; k < ANIMALS.length; k++) {
+        var a = ANIMALS[k];
+        var pos = Math.min(5 + (a.ms / 850) * 90, 95);
+        var hl = a.ms === animal.ms ? ' highlight' : '';
+        html += '<div class="marker' + hl + '" style="left:' + pos + '%" title="' + a[state.lang] + ': ' + a.ms + 'ms">' + a.emoji + '</div>';
+      }
+      var userPos = Math.min(5 + (avg / 850) * 90, 95);
+      html += '<div class="user-marker" style="left:' + userPos + '%;background:' + rank.color + ';box-shadow:0 0 12px ' + rank.color + '"></div>';
+      html += '</div>';
+      html += '<p class="animal-result">' + txt.animal + ' <strong style="color:' + rank.color + '">' + animal.emoji + ' ' + animal[state.lang] + '</strong></p>';
+      html += '</div>';
+      // Actions
+      html += '<div class="actions">';
+      html += '<button class="retry-btn" onclick="resetGame()">' + txt.tryAgain + '</button>';
+      html += '<button class="share-btn" style="background:linear-gradient(135deg,' + rank.color + ',' + rank.color + 'cc);box-shadow:0 0 20px ' + rank.color + '40" onclick="shareResult()">' + (s.showCopied ? txt.copied : txt.share) + '</button>';
+      html += '</div>';
+      // Ad space
+      html += '<div class="ad-space"><!-- AdSense ad unit here --></div>';
+      html += '</div>';
+    }
+
+    html += '</div>'; // zone end
+
+    // Footer ad on idle
+    if (s.phase === "idle") {
+      html += '<div class="ad-footer"><div class="ad-space"><!-- AdSense ad unit here --></div></div>';
+    }
+
+    app.innerHTML = html;
+  }
+
+  function startRound() {
+    if (state.round >= TOTAL_ROUNDS) return;
+    state.phase = "waiting";
+    state.currentTime = null;
+    canProceed = false;
+    render();
+    var delay = 1500 + Math.random() * 3500;
+    timerId = setTimeout(function() {
+      state.phase = "go";
+      startTime = performance.now();
+      render();
+    }, delay);
+  }
+
+  window.startGame = function() {
+    state.round = 0;
+    state.results = [];
+    startRound();
+  };
+
+  window.handleClick = function() {
+    if (state.phase === "idle" || state.phase === "done") return;
+
+    if (state.phase === "waiting") {
+      clearTimeout(timerId);
+      state.phase = "tooEarly";
+      render();
+    } else if (state.phase === "tooEarly") {
+      startRound();
+    } else if (state.phase === "go") {
+      var elapsed = Math.round(performance.now() - startTime);
+      state.currentTime = elapsed;
+      state.results.push(elapsed);
+      state.round++;
+      if (state.round >= TOTAL_ROUNDS) {
+        state.phase = "done";
+      } else {
+        state.phase = "roundResult";
+        canProceed = false;
+        setTimeout(function() { canProceed = true; }, 800);
+      }
+      render();
+    } else if (state.phase === "roundResult" && canProceed) {
+      startRound();
+    }
+  };
+
+  window.resetGame = function() {
+    clearTimeout(timerId);
+    state.phase = "idle";
+    state.round = 0;
+    state.results = [];
+    state.currentTime = null;
+    render();
+  };
+
+  window.toggleLang = function() {
+    state.lang = state.lang === "ja" ? "en" : "ja";
+    document.documentElement.lang = state.lang;
+    render();
+  };
+
+  window.shareResult = function() {
+    var txt = t();
+    var avg = Math.round(state.results.reduce(function(a,b){return a+b},0) / state.results.length);
+    var rank = getRank(avg);
+    var animal = getClosestAnimal(avg);
+    var shareText = txt.shareText(avg, rank.tier, animal[state.lang]);
+
+    if (navigator.share) {
+      navigator.share({ text: shareText }).catch(function(){});
+    } else {
+      navigator.clipboard.writeText(shareText).then(function() {
+        state.showCopied = true;
+        render();
+        setTimeout(function() { state.showCopied = false; render(); }, 2000);
+      }).catch(function(){});
+    }
+  };
+
+  // Prevent double-tap zoom on mobile
+  document.addEventListener('touchend', function(e) {
+    if (state.phase !== "idle" && state.phase !== "done") {
+      e.preventDefault();
+      handleClick();
+    }
+  }, { passive: false });
+
+  // Init
+  render();
+})();
+</script>
+</body>
+</html>
